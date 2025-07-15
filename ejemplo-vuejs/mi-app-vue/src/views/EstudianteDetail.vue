@@ -10,8 +10,19 @@
 
       <h4>Números Telefónicos:</h4>
       <ul v-if="numerosTelefonicos.length">
-        <li v-for="numero in numerosTelefonicos" :key="numero.url">
-          {{ numero.telefono }} ({{ numero.tipo }})
+        <li v-for="(numero, index) in numerosTelefonicos" :key="numero.url">
+          <div v-if="!editandoNumeros[index]">
+            {{ numero.telefono }} ({{ numero.tipo }})
+            <button @click="habilitarEdicion(index)">Editar</button>
+            <button @click="eliminarNumero(numero, index)">Eliminar</button>
+          </div>
+          <div v-else>
+            <input v-model="numero.telefono" placeholder="Número" type="text" />
+            <input v-model="numero.tipo" placeholder="Tipo" type="text" />
+            <button @click="guardarNumero(numero, index)">Guardar</button>
+            <button @click="cancelarEdicion(index)">Cancelar</button>
+            <button @click="eliminarNumero(numero, index)">Eliminar</button>
+          </div>
         </li>
       </ul>
       <p v-else>No tiene números telefónicos registrados.</p>
@@ -34,6 +45,7 @@ export default {
     return {
       estudiante: null,
       numerosTelefonicos: [],
+      editandoNumeros: [],
       loading: true,
       error: null,
     };
@@ -75,6 +87,48 @@ export default {
           "Error al cargar números telefónicos:",
           err.response || err
         );
+      }
+      this.editandoNumeros = this.numerosTelefonicos.map(() => false);
+    },
+    async guardarNumero(numero, index) {
+      try {
+        await api.put(numero.url, {
+          telefono: numero.telefono,
+          tipo: numero.tipo,
+          estudiante: numero.estudiante,
+        });
+        alert("Número actualizado correctamente.");
+        this.editandoNumeros[index] = false;
+      } catch (error) {
+        console.error("Error al actualizar número:", error.response || error);
+        alert("Ocurrió un error al actualizar el número.");
+      }
+    },
+    habilitarEdicion(index) {
+      this.editandoNumeros[index] = true;
+    },
+
+    async cancelarEdicion(index) {
+      this.editandoNumeros[index] = false;
+      await this.fetchNumerosTelefonicos(
+        decodeURIComponent(this.estudianteUrl)
+      );
+    },
+    async eliminarNumero(numero, index) {
+      if (!confirm("¿Estás seguro de que quieres eliminar este número?")) {
+        return;
+      }
+
+      try {
+        await api.delete(numero.url);
+        alert("Número eliminado correctamente.");
+
+        // Quitar del array local
+        this.numerosTelefonicos.splice(index, 1);
+        this.editandoNumeros.splice(index, 1);
+      } catch (error) {
+        console.error("Error al eliminar número:", error.response || error);
+        alert("Ocurrió un error al eliminar el número.");
       }
     },
   },
