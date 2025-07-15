@@ -25,4 +25,11 @@
 ### Recomendación
 
  * Tomar un tiempo produnte para analizar el código ya generado en VueJs
- 
+
+### Promps Teléfonos
+* Hola chat, puedes analizar lo que se hace en esta view en vuejs y explicarlo linea a linea: (codigo EstudiantesList.vue)
+* Me gustaria crear un metodo para poder editar los numeros telefonicos
+* Y si me gustaria tener un boton editar que habilite la opcion de cambiar datos de cada teléfono
+* Listo, ya es correcto, ahora vamos a implementar eliminacion de un numero
+
+
